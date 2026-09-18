@@ -33,7 +33,7 @@ echo "Configured Models:"
 echo "=================="
 echo ""
 
-for alias in qwen35-9b gemma4-26b qwen35-35b; do
+for alias in qwen35-35b bonsai-27b; do
     status=$(echo "$models_json" | jq -r ".data[]? | select(.id == \"$alias\") | .status.value" || echo "not found")
     
     case "$status" in

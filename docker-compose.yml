@@ -10,7 +10,7 @@ services:
   llama-server:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ${DOCKERFILE:-Dockerfile}
     image: llama-server:${IMAGE_TAG:-standard}
     container_name: llama-server
     restart: unless-stopped

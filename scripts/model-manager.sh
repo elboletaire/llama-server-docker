@@ -110,7 +110,7 @@ show_status() {
     echo -e "${BLUE}=== Model Status ($(date)) ===${NC}"
     echo ""
 
-    for alias in qwen35-9b gemma4-26b qwen35-35b; do
+    for alias in qwen35-35b bonsai-27b; do
         loaded=$(is_model_loaded "$alias")
 
         echo -n "${alias}: "

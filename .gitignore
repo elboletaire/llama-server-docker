@@ -7,8 +7,12 @@
 # Runtime artifacts
 logs/
 rotorquant-bin/
+prism-bin/
 .cache/
 scripts/.model_last_used/
 
 # Pi agent config
 .pi/
+
+# Config backups
+config/models.ini.bak-*
