@@ -13,9 +13,9 @@ if [ -z "$alias" ]; then
     echo "Usage: $0 <alias>"
     echo ""
     echo "Available aliases:"
-    echo "  qwen-code - Qwen3 Coder Next"
-    echo "  qwen35    - Qwen3.5 35B A3B (Q4_K_M)"
-    echo "  glm       - GLM-4.7 Flash REAP"
+    echo "  qwen35-9b   - Qwen3.5 9B Q8_0 (fast agent)"
+    echo "  gemma4-26b  - Gemma 4 26B-A4B Q4_K_M (quality agent)"
+    echo "  qwen35-35b  - Qwen3.5 35B-A3B Q4_K_XL (max quality, GPU+RAM split)"
     exit 1
 fi
 

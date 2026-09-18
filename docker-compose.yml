@@ -1,10 +1,6 @@
-version: '3.8'
-
 networks:
   llama-server:
     external: false
-  proxy:
-    external: true
 
 volumes:
   models:
@@ -12,6 +8,9 @@ volumes:
 
 services:
   llama-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: llama-server:${IMAGE_TAG:-standard}
     container_name: llama-server
     restart: unless-stopped
@@ -56,17 +55,6 @@ services:
 
     networks:
       - llama-server
-      - proxy
-
-    # Traefik labels for reverse proxy (adjust for your domain)
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.llama-server.rule=Host(`${TRAEFIK_HOST:-llama.localhost}`)"
-      - "traefik.http.routers.llama-server.tls=true"
-      - "traefik.http.routers.llama-server.tls.certresolver=default"
-      - "traefik.http.routers.llama-server.middlewares=llama-auth"
-      - "traefik.http.services.llama-server.loadbalancer.server.port=8080"
-      - "traefik.http.middlewares.llama-auth.basicauth.users=${TRAEFIK_BASICAUTH:-}"
 
     # Health check
     healthcheck:

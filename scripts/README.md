@@ -20,15 +20,15 @@ This directory contains scripts for automatic model offloading based on usage ti
 ./check-models.sh
 
 # Track usage (after WebUI usage)
-./track-usage.sh qwen
+./track-usage.sh qwen35-9b
 
 # Load a model
-./load-model.sh glm
+./load-model.sh gemma4-26b
 
 # Make API call with tracking
 ./api-wrapper.sh http://localhost:11434/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -d '{"model": "qwen", "messages": [{"role": "user", "content": "Hello"}]}'
+  -d '{"model": "qwen35-9b", "messages": [{"role": "user", "content": "Hello"}]}'
 
 # Start auto-offload daemon
 ./model-manager.sh start

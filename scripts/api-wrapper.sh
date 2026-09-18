@@ -84,12 +84,12 @@ Examples:
   # Chat completion
   ./scripts/api-wrapper.sh http://localhost:11434/v1/chat/completions \
     -H "Content-Type: application/json" \
-    -d '{"model": "qwen", "messages": [{"role": "user", "content": "Hello"}]}'
+    -d '{"model": "qwen35-9b", "messages": [{"role": "user", "content": "Hello"}]}'
 
   # Completion  
   ./scripts/api-wrapper.sh http://localhost:11434/v1/completions \
     -H "Content-Type: application/json" \
-    -d '{"model": "glm", "prompt": "Continue this sentence:"}'
+    -d '{"model": "qwen35-9b", "prompt": "Continue this sentence:"}'
 
 The wrapper will:
 1. Extract the model name from your request
