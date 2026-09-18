@@ -31,6 +31,18 @@ services:
       - LLAMA_ARG_PORT=8080
       - LLAMA_ARG_JINJA=true
 
+      # HTTP read/write timeout (from upstream a024d11). The entrypoint
+      # defaults to 120s, too short for a cold replay of a near-full
+      # context; 600s lets the slow turn finish instead of being killed
+      # mid-flight and triggering a full reprocess on retry.
+      - LLAMA_ARG_TIMEOUT=600
+
+      # Prompt cache cap. The entrypoint default is 32768 MiB, sized for
+      # upstream's box and its DeltaNet checkpoint retention. This machine
+      # has 61GB total and needs headroom for CPU-offloaded layers, so the
+      # cap is halved. Raise if agentic prefix reuse is evicting too early.
+      - LLAMA_ARG_CACHE_RAM=16384
+
       # Router mode - use curated preset file (no filesystem auto-discovery)
       - LLAMA_ARG_MODELS_PRESET=/config/models.ini
       - LLAMA_ARG_MODELS_MAX=1

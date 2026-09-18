@@ -3,7 +3,7 @@
 # llama-server Docker Entrypoint
 # Uses router mode with curated model presets
 
-set -e
+set -o pipefail
 
 # Colors for output
 RED='\033[0;31m'
@@ -27,8 +27,8 @@ MODELS_PRESET=${LLAMA_ARG_MODELS_PRESET:-"/config/models.ini"}
 MODELS_MAX=${LLAMA_ARG_MODELS_MAX:-"4"}
 MODELS_AUTOLOAD=${LLAMA_ARG_MODELS_AUTOLOAD:-"true"}
 NGP_LAYERS=${LLAMA_ARG_N_GPU_LAYERS:-"-1"}
+CACHE_RAM=${LLAMA_ARG_CACHE_RAM:-"32768"}
 FLASH_ATTN=${LLAMA_ARG_FLASH_ATTN:-"on"}
-JINJA=${LLAMA_ARG_JINJA:-"true"}
 
 # Display configuration
 log_info "Starting llama-server in router mode..."
@@ -38,6 +38,7 @@ log_config "  Max models: $MODELS_MAX"
 log_config "  Auto-load: $MODELS_AUTOLOAD"
 log_config "  GPU layers: $NGP_LAYERS (-1 = all)"
 log_config "  Flash attention: $FLASH_ATTN"
+log_config "  Prompt cache RAM: ${CACHE_RAM} MiB"
 log_config "  Timeout: ${LLAMA_ARG_TIMEOUT:-120}s"
 
 if [ -n "$MODELS_DIR" ]; then
@@ -88,6 +89,7 @@ CMD_ARGS=(
     "--models-autoload"
     "--n-gpu-layers" "$NGP_LAYERS"
     "--timeout" "$TIMEOUT"
+    "--cache-ram" "$CACHE_RAM"
 )
 
 # Optional directory discovery
@@ -104,6 +106,22 @@ if [ "$JINJA" = "true" ]; then
     CMD_ARGS+=("--jinja")
 fi
 
-# Start llama-server
+# MTP speculative decoding (upstream in llama.cpp master since 2026-05-16)
+SPEC_TYPE=${LLAMA_ARG_SPEC_TYPE:-""}
+SPEC_DRAFT_N_MAX=${LLAMA_ARG_SPEC_DRAFT_N_MAX:-"6"}
+SPEC_DRAFT_P_MIN=${LLAMA_ARG_SPEC_DRAFT_P_MIN:-""}
+if [ -n "$SPEC_TYPE" ]; then
+    CMD_ARGS+=("--spec-type" "$SPEC_TYPE" "--spec-draft-n-max" "$SPEC_DRAFT_N_MAX")
+    if [ -n "$SPEC_DRAFT_P_MIN" ]; then
+        CMD_ARGS+=("--spec-draft-p-min" "$SPEC_DRAFT_P_MIN")
+    fi
+    log_config "  Speculative decoding: $SPEC_TYPE (draft-n-max=$SPEC_DRAFT_N_MAX, draft-p-min=${SPEC_DRAFT_P_MIN:-default})"
+fi
+
+# Start llama-server with stdout+stderr going to both Docker and log file.
+# Redirect fds first, then exec replaces PID 1 with llama-server.
 log_info "Initializing llama-server..."
+LOG_FILE="/app/logs/llama-server.log"
+: > "$LOG_FILE"
+exec > >(tee -a "$LOG_FILE") 2>&1
 exec "$CMD" "${CMD_ARGS[@]}"
